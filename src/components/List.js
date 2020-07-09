@@ -1,11 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    FormControlLabel
-} from "@material-ui/core/";
+import { Accordion, AccordionSummary, AccordionDetails, FormControlLabel } from "@material-ui/core/";
 import Typography from "@material-ui/core/Typography";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -17,26 +12,11 @@ const useStyles = makeStyles({
     },
 });
 
-const listData = [
-    {
-        name: "Itzel Goldberger",
-        description: "Lives in Dracan"
-    },
-    {
-        name: "Roe Vask",
-        description: "Wandering Half-Orc"
-    },
-    {
-        name: "Senechal O'Brien",
-        description: "Badass dude"
-    }
-]
-
-function List() {
+function List(props) {
     const classes = useStyles();
     return (
         <div className={classes.root}>
-            {listData.map(character => (
+            {props.characters.map(character => (
                 <Accordion key={character.name}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
