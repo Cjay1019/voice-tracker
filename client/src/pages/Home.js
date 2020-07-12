@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import List from "../components/List";
-import { TextField, Container, makeStyles } from '@material-ui/core/';
+import { TextField, Container, makeStyles, Button } from '@material-ui/core/';
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => {
     return ({
@@ -40,6 +41,28 @@ function Home() {
         setCharacters(listData.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm]);
 
+    // TODO: delete this later after reused
+    // const testMethod = () => {
+    //     const newUser = {
+    //         darkModeOn: true,
+    //         userInfo: {
+    //             name: "Ya Boi",
+    //             email: "test@testing.com",
+    //             password: "Pass1234"
+    //         },
+    //         characters: [
+    //             {
+    //                 id: "1111",
+    //                 name: "Katla",
+    //                 description: "Super Kewl",
+    //                 fileUrl: "http://google.com"
+    //             }
+    //         ]
+    //     }
+    //     axios.post("/api/create", newUser).then(res => {
+    //         console.log("success?", res.data);
+    //     });
+    // }
 
     return (
         <Container maxWidth="md">
