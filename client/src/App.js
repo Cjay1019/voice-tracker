@@ -24,6 +24,9 @@ function App() {
           <Route path="/">
             <Home />
           </Route>
+          <Route path="/test">
+            <h1>SUCCESS</h1>
+          </Route>
         </Switch>
       </Router>
     </ThemeProvider>

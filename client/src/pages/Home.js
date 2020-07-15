@@ -66,6 +66,7 @@ function Home() {
 
     return (
         <Container maxWidth="md">
+            {/* <Button onClick={testMethod}>Testing</Button> */}
             <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search field" variant="outlined" />
             <List characters={characters} />
         </Container>

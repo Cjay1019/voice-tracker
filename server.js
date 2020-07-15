@@ -2,10 +2,8 @@ const express = require("express");
 const path = require("path");
 const PORT = process.env.PORT || 3001;
 const app = express();
+const bodyParser = require("body-parser")
 const mongoose = require("mongoose");
-const localStrategy = require("passport-local").Strategy;
-const User = require("../models/user");
-const passport = require("passport");
 
 
 // Define middleware here
@@ -18,52 +16,26 @@ if (process.env.NODE_ENV === "production") {
     console.log("env success");
 }
 
+// app.use(bodyParser.json())
+// app.use(bodyParser.urlencoded({ extended: false }));
+
+require("./utils/passport")
 require("./routes/api.js")(app);
 
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
-passport.use("signup", new localStrategy({
-    usernameField: "email",
-    passwordField: "password"
-}, async (email, password, done) => {
-    try {
-        const user = await User.create({ email, password });
-        return done(null, user);
-    } catch (error) {
-        done(error);
-    }
-}));
 
-passport.use("login", new localStrategy({
-    usernameField: "email",
-    passwordField: "password"
-}, async (email, password, done) => {
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return done(null, false, { message: "User not found" });
-        }
-
-        const validate = await user.isValidPassword(password);
-        if (!validate) {
-            return done(null, false, { message: "Incorrect Password" });
-        }
-        return done(null, user, { message: "Logged in Successfully" });
-    } catch (error) {
-        return done(error);
-    }
-}))
 
 //Database
 //if deployed, use the deployed database, otherwise use local database
 let db = process.env.MONGODB_URI || "mongodb://localhost/voiceTracker";
 
 //connect mongoose to database
-mongoose.connect(db, { useNewUrlParser: true }, error => {
+mongoose.connect(db, { useUnifiedTopology: true, useCreateIndex: true, useNewUrlParser: true }, error => {
     if (error) {
-        console.log("Error: " + error);
+        console.error("Error: " + error);
     } else {
         console.log("Mongoose connection successful");
     }

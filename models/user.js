@@ -25,11 +25,6 @@ let userSchema = new Schema({
     },
     characters: [
         {
-            id: {
-                type: String,
-                required: true,
-                unique: true
-            },
             name: {
                 type: String,
                 required: true
@@ -47,17 +42,21 @@ let userSchema = new Schema({
     ]
 });
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", function (next) {
     const user = this;
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
-    next();
+    bcrypt.hash(user.userInfo.password, 10, (err, hash) => {
+        if (err) return next(err);
+        user.userInfo.password = hash;
+        next();
+    })
 })
 
-userSchema.methods.isValidPassword = async function (password) {
+userSchema.methods.isValidPassword = function (password, next) {
     const user = this;
-    const compare = await bcrypt.compare(password, user.password);
-    return compare;
+    bcrypt.compare(password, user.userInfo.password, (err, result) => {
+        if (err) return err;
+        next(null, result);
+    });
 }
 
 const User = mongoose.model("User", userSchema);
