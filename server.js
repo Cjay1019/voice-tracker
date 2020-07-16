@@ -19,9 +19,9 @@ if (process.env.NODE_ENV === "production") {
 // app.use(bodyParser.json())
 // app.use(bodyParser.urlencoded({ extended: false }));
 
-require("./utils/passport")
+require("./utils/passport");
 require("./routes/api.js")(app);
-
+require("./routes/secure-routes.js")(app);
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });

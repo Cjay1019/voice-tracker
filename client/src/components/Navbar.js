@@ -1,22 +1,21 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 
-const useStyles = makeStyles((theme) => {
-    return ({
-        root: {
-            flexGrow: 1,
-        },
-        menuButton: {
-            marginRight: theme.spacing(2),
-        },
-        title: {
-            flexGrow: 1,
-        },
-    })
-});
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    title: {
+        flexGrow: 1,
+    },
+})
+);
 
 function Navbar(props) {
     const classes = useStyles();
@@ -31,7 +30,7 @@ function Navbar(props) {
                 <Button color="inherit">Login</Button>
             </Toolbar>
         </AppBar>
-    )
-}
+    );
+};
 
 export default Navbar;

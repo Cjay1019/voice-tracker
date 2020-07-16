@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import Landing from "./pages/Landing";
 import { createMuiTheme, ThemeProvider, CssBaseline } from "@material-ui/core";
 
 
@@ -22,10 +23,10 @@ function App() {
       <Router>
         <Switch>
           <Route path="/">
-            <Home />
+            <Landing />
           </Route>
-          <Route path="/test">
-            <h1>SUCCESS</h1>
+          <Route path="/home">
+            <Home />
           </Route>
         </Switch>
       </Router>

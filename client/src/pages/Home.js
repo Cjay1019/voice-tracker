@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import List from "../components/List";
-import { TextField, Container, makeStyles, Button } from '@material-ui/core/';
-import axios from "axios";
+import { TextField, Container, makeStyles } from '@material-ui/core/';
 
 const useStyles = makeStyles((theme) => {
     return ({
@@ -66,7 +65,6 @@ function Home() {
 
     return (
         <Container maxWidth="md">
-            {/* <Button onClick={testMethod}>Testing</Button> */}
             <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search field" variant="outlined" />
             <List characters={characters} />
         </Container>

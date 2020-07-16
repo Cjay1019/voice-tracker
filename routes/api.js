@@ -19,7 +19,7 @@ module.exports = function (app) {
             req.login(user, { session: false }, (error) => {
                 if (error) return next(error);
                 const body = { _id: user._id, email: user.userInfo.email }
-                jwt.sign({ user: body }, "test-secret", (err, token) => {
+                jwt.sign({ user: body }, process.env.JWT_SECRET, (err, token) => {
                     if (err) return next(err);
                     return res.json({ token });
                 });
