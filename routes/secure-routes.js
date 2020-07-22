@@ -1,13 +1,12 @@
 const passport = require("passport");
 
 module.exports = function (app) {
-    const test = app.get("/test", (req, res) => {
-        res.json({
-            message: "Secure route",
-            user: req.user,
-            token: req.query.secret_token
-        })
-    });
 
-    app.get("/user", passport.authenticate("jwt", { session: false }), test);
+
+    app.get("/test", (req, res, next) => {
+        passport.authenticate("jwt", { session: false }, (err, token, info) => {
+            if (token.iat) res.json({success: true, message: "Token authenticated"})
+            else if (info) res.json({ success: false, message: info.message })
+        })(req, res, next)
+    });
 };

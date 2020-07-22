@@ -8,12 +8,14 @@ const useStyles = makeStyles((theme) => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+    },
+    link: {
+        cursor: "pointer"
     }
 }));
 
-function Signin() {
+function Signin({ setSignin }) {
     const classes = useStyles();
-
 
     return (
         <form className={classes.form} noValidate>
@@ -82,7 +84,7 @@ function Signin() {
           </Button>
             <Grid container justify="flex-end">
                 <Grid item>
-                    <Link href="#" variant="body2">
+                    <Link variant="body2" onClick={() => setSignin(true)} className={classes.link}>
                         Already have an account? Sign in
               </Link>
                 </Grid>

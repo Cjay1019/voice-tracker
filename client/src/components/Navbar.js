@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Brightness4Icon from '@material-ui/icons/Brightness4';
@@ -17,15 +18,16 @@ const useStyles = makeStyles((theme) => ({
 })
 );
 
-function Navbar(props) {
+function Navbar() {
     const classes = useStyles();
+    const [user, setUser] = useContext(UserContext);
 
     return (
         <AppBar position="static">
             <Toolbar>
                 <Typography variant="h6" className={classes.title}>Voice Tracker</Typography>
-                <Button onClick={() => props.setDarkMode(!props.darkModeOn)} color="inherit">
-                    {props.darkModeOn ? <Brightness7Icon /> : <Brightness4Icon />}
+                <Button onClick={() => setUser({ ...user, darkModeOn: !user.darkModeOn })} color="inherit">
+                    {user.darkModeOn ? <Brightness7Icon /> : <Brightness4Icon />}
                 </Button>
                 <Button color="inherit">Login</Button>
             </Toolbar>

@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
 import { makeStyles, Link, Grid, Button, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -8,15 +11,41 @@ const useStyles = makeStyles((theme) => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+    },
+    link: {
+        cursor: "pointer"
     }
 }));
 
-function Signin() {
+function Signin({ setSignin }) {
     const classes = useStyles();
+    const history = useHistory();
 
+    const [info, setInfo] = useState({ email: "", password: "" });
+    const [user, setUser] = useContext(UserContext);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        axios.post("/api/signin", info).then(res => {
+            if (res.data.success) {
+                setUser({
+                    ...user,
+                    email: res.data.email,
+                    userId: res.data._id,
+                    token: res.data.token,
+                    darkModeOn: res.data.darkModeOn
+                });
+                history.push("/");
+            } else {
+                console.error(res.data.message)
+            }
+        });
+    }
+
+    const handleChange = e => setInfo({ ...info, [e.target.name]: e.target.value });
 
     return (
-        <form className={classes.form} noValidate>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
             <TextField
                 variant="outlined"
                 margin="normal"
@@ -25,8 +54,10 @@ function Signin() {
                 id="email"
                 label="Email Address"
                 name="email"
+                value={info.email}
                 autoComplete="email"
                 autoFocus
+                onChange={handleChange}
             />
             <TextField
                 variant="outlined"
@@ -34,10 +65,12 @@ function Signin() {
                 required
                 fullWidth
                 name="password"
+                value={info.password}
                 label="Password"
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={handleChange}
             />
             <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -58,7 +91,7 @@ function Signin() {
                                 </Link>
                 </Grid>
                 <Grid item>
-                    <Link href="#" variant="body2">
+                    <Link variant="body2" onClick={() => setSignin(false)} className={classes.link}>
                         {"Don't have an account? Sign Up"}
                     </Link>
                 </Grid>

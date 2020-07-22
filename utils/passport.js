@@ -5,12 +5,12 @@ const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 
 passport.use("signup", new localStrategy({
-    usernameField: "userInfo[email]",
-    passwordField: "userInfo[password]",
+    usernameField: "email",
+    passwordField: "password",
     passReqToCallback: true
 }, (req, email, password, done) => {
-    req.body.userInfo.email = email;
-    req.body.userInfo.password = password;
+    req.body.email = email;
+    req.body.password = password;
     User.create(req.body, (err, user) => {
         if (err) return done(err);
         return done(null, user)
@@ -22,7 +22,7 @@ passport.use("login", new localStrategy({
     passwordField: "password"
 }, async (email, password, done) => {
 
-    User.findOne({ "userInfo.email": email }, (err, user) => {
+    User.findOne({ "email": email }, (err, user) => {
         if (err) return done(error);
         if (!user) return done(null, false, { message: "User not found" });
         else {
@@ -33,26 +33,17 @@ passport.use("login", new localStrategy({
             })
         }
     });
-    // try {
-    //     const user = await User.findOne({ "userInfo.email": email });
-    //     if (!user) {
-    //         return done(null, false, { message: "User not found" });
-    //     }
-
-    //     const validate = await user.isValidPassword(password);
-    //     if (!validate) {
-    //         return done(null, false, { message: "Incorrect Password" });
-    //     }
-    //     return done(null, user, { message: "Logged in Successfully" });
-    // } catch (error) {
-    //     return done(error);
-    // }
 }));
 
 passport.use(new JWTstrategy({
     secretOrKey: process.env.JWT_SECRET,
     jwtFromRequest: ExtractJWT.fromUrlQueryParameter("secret_token")
-}, (err, token, done) => {
-    if (err) return done(err);
-    return done(null, token.user);
+}, async (token, done) => {
+    console.log("hit jwt")
+    try {
+        return done(null, token);
+    } catch (error) {
+        console.log("err")
+        done(error);
+    }
 }));

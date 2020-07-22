@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { makeStyles, Box, Grid, Paper, Avatar, Typography } from '@material-ui/core';
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Signin from "../components/Signin";
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
         height: '-webkit-fill-available'
     },
     image: {
-        backgroundImage: 'url(https://source.unsplash.com/random)',
+        backgroundImage: 'url(https://s3.amazonaws.com/files.d20.io/images/88678395/3x2hzJidAn9egM4u5wED5A/max.jpg?1565327959)',
         backgroundRepeat: 'no-repeat',
         backgroundColor:
             theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
@@ -32,8 +32,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+
 function Landing() {
     const classes = useStyles();
+    const [signin, setSignin] = useState(true);
 
     return (
         <Grid container component="main" className={classes.root}>
@@ -44,7 +46,7 @@ function Landing() {
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">Sign in</Typography>
-                    <Signin />
+                    {signin ? <Signin setSignin={setSignin} /> : <Signup setSignin={setSignin} />}
                     <Box mt={5}>
                         <Copyright />
                     </Box>
