@@ -1,25 +1,29 @@
 import React, { useState, useEffect, useContext } from "react";
 import List from "../components/List";
-import { TextField, Container, makeStyles, CircularProgress } from '@material-ui/core/';
+import { TextField, Container, makeStyles, CircularProgress, Fab, Tooltip, Zoom } from '@material-ui/core/';
+import AddIcon from "@material-ui/icons/Add";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 
-const useStyles = makeStyles((theme) => {
-    return ({
-        searchBar: {
-            marginTop: theme.spacing(2),
-            marginBottom: theme.spacing()
-        },
-        spinner: {
-            width: "80px !important",
-            height: "80px !important",
-            position: "absolute",
-            top: "50%",
-            left: "50%"
-        }
-    })
-});
+const useStyles = makeStyles(theme => ({
+    searchBar: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing()
+    },
+    spinner: {
+        width: "80px !important",
+        height: "80px !important",
+        position: "absolute",
+        top: "50%",
+        left: "50%"
+    },
+    fab: {
+        position: 'absolute',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    }
+}));
 
 function Home() {
     const [searchTerm, setSearch] = useState("");
@@ -32,7 +36,7 @@ function Home() {
     const classes = useStyles();
 
     const tokenIsValid = async () => {
-        const results = await axios.get(`/test?secret_token=${user.token || ""}`);
+        const results = await axios.get(`/verifyToken?secret_token=${user.token || ""}`);
         if (results.data.success) {
             console.log(results.data.message);
 
@@ -60,6 +64,9 @@ function Home() {
                 <>
                     <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search field" variant="outlined" />
                     <List characters={filteredCharacters.length > 0 ? filteredCharacters : characters} />
+                    <Tooltip TransitionComponent={Zoom} title="Add character" placement="left">
+                        <Fab color="primary" aria-label="add" className={classes.fab} ><AddIcon /></Fab>
+                    </Tooltip>
                 </>
                 :
                 <CircularProgress className={classes.spinner} />}

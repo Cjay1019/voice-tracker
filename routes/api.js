@@ -2,7 +2,6 @@
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const Character = require('../models/character');
-const User = require('../models/user');
 
 
 module.exports = function (app) {
@@ -27,13 +26,6 @@ module.exports = function (app) {
             if (err) res.json(err);
             res.json(characters);
         });
-    });
-
-    app.post("/api/pop", (req, res) => {
-        User.findOne({ "email": req.body.email })
-            .populate("characters").exec((err, characters) => {
-                res.json(characters)
-            })
     });
 
     app.post("/api/signin", (req, res, next) => {

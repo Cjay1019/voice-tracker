@@ -1,15 +1,17 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Accordion, AccordionSummary, AccordionDetails, FormControlLabel } from "@material-ui/core/";
+import { Accordion, AccordionSummary, AccordionDetails, FormControlLabel, makeStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AudioControl from "./AudioControl";
+import Toolbar from "./Toolbar";
 
 const useStyles = makeStyles({
     root: {
         width: "100%",
     },
+    accordianDetails: {
+        paddingRight: "0"
+    }
 });
 
 function List(props) {
@@ -32,8 +34,9 @@ function List(props) {
                             label={character.name}
                         />
                     </AccordionSummary>
-                    <AccordionDetails>
+                    <AccordionDetails className={classes.accordianDetails}>
                         <Typography color="textSecondary">{character.description}</Typography>
+                        <Toolbar character={character} />
                     </AccordionDetails>
                 </Accordion>
             ))}
