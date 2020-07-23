@@ -21,26 +21,11 @@ const useStyles = makeStyles((theme) => {
     })
 });
 
-const listData = [
-    {
-        name: "Itzel Goldberger",
-        description: "Lives in Dracan"
-    },
-    {
-        name: "Roe Vask",
-        description: "Wandering Half-Orc"
-    },
-    {
-        name: "Senechal O'Brien",
-        description: "Badass dude"
-    }
-];
-
-
 function Home() {
     const [searchTerm, setSearch] = useState("");
     const [auth, setAuth] = useState(false);
-    const [characters, setCharacters] = useState(listData);
+    const [characters, setCharacters] = useState([]);
+    const [filteredCharacters, setFilteredCharacters] = useState(characters);
     const [user] = useContext(UserContext);
 
     const history = useHistory();
@@ -50,6 +35,10 @@ function Home() {
         const results = await axios.get(`/test?secret_token=${user.token || ""}`);
         if (results.data.success) {
             console.log(results.data.message);
+
+            const characterList = await axios.post("/api/getCharacters", { userId: user.userId });
+
+            setCharacters(characterList.data);
             setAuth(true);
         } else {
             console.error(results.data.message)
@@ -59,12 +48,10 @@ function Home() {
 
     const handleChange = e => setSearch(e.target.value);
 
-    useEffect(() => {
-        tokenIsValid();
-    }, []);
+    useEffect(() => tokenIsValid(), []);
 
     useEffect(() => {
-        setCharacters(listData.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
+        setFilteredCharacters(characters.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm]);
 
     return (
@@ -72,12 +59,12 @@ function Home() {
             {auth ?
                 <>
                     <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search field" variant="outlined" />
-                    <List characters={characters} />
+                    <List characters={filteredCharacters.length > 0 ? filteredCharacters : characters} />
                 </>
                 :
                 <CircularProgress className={classes.spinner} />}
         </Container>
     );
-}
+};
 
 export default Home;

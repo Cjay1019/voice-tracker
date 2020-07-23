@@ -26,8 +26,8 @@ function List(props) {
                     >
                         <FormControlLabel
                             aria-label="Acknowledge"
-                            onClick={(event) => event.stopPropagation()}
-                            onFocus={(event) => event.stopPropagation()}
+                            onClick={event => event.stopPropagation()}
+                            onFocus={event => event.stopPropagation()}
                             control={<AudioControl fileName="phoebe.mp3" />}
                             label={character.name}
                         />

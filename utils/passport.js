@@ -24,11 +24,11 @@ passport.use("login", new localStrategy({
 
     User.findOne({ "email": email }, (err, user) => {
         if (err) return done(error);
-        if (!user) return done(null, false, { message: "User not found" });
+        if (!user) return done(null, false, { message: "User not found", error: 1000 });
         else {
             user.isValidPassword(password, (err, match) => {
                 if (err) return done(error);
-                if (!match) return done(null, false, { message: "Incorrect Password" });
+                if (!match) return done(null, false, { message: "Incorrect Password", error: 1001 });
                 else return done(null, user, { message: "Logged in Successfully" });
             })
         }
@@ -39,11 +39,9 @@ passport.use(new JWTstrategy({
     secretOrKey: process.env.JWT_SECRET,
     jwtFromRequest: ExtractJWT.fromUrlQueryParameter("secret_token")
 }, async (token, done) => {
-    console.log("hit jwt")
     try {
         return done(null, token);
     } catch (error) {
-        console.log("err")
         done(error);
     }
 }));

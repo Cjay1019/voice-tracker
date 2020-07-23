@@ -7,7 +7,7 @@ import Copyright from "../components/Copyright";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: '-webkit-fill-available'
+        height: "100vh"
     },
     image: {
         backgroundImage: 'url(https://s3.amazonaws.com/files.d20.io/images/88678395/3x2hzJidAn9egM4u5wED5A/max.jpg?1565327959)',
