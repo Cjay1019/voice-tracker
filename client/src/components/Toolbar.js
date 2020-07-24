@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IconButton, Tooltip, Zoom, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import axios from "axios";
 
 const useStyles = makeStyles(theme => ({
     deleteIcon: {
@@ -18,9 +19,15 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Toolbar({ character }) {
+function Toolbar({ character, getCharacters }) {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
+
+    const deleteCharacter = () => {
+        axios.post("/api/deleteCharacter", { _id: character._id }).then(res => console.log);
+        setOpen(false);
+        getCharacters();
+    };
 
     return (
         <>
@@ -45,7 +52,7 @@ function Toolbar({ character }) {
                 <DialogTitle id="alert-dialog-title">{`Delete ${character.name}?`}</DialogTitle>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} className={classes.cancelButton}>Cancel</Button>
-                    <Button onClick={() => setOpen(false)} autoFocus className={classes.deleteButton}>Delete</Button>
+                    <Button onClick={deleteCharacter} autoFocus className={classes.deleteButton}>Delete</Button>
                 </DialogActions>
             </Dialog>
         </>

@@ -21,7 +21,7 @@ function Signin({ setSignin }) {
     const classes = useStyles();
     const history = useHistory();
 
-    const [info, setInfo] = useState({ email: "", password: "" });
+    const [info, setInfo] = useState({ email: "", password: "", remember: false });
     const [emailError, setEmailError] = useState(null);
     const [passwordError, setPasswordError] = useState(null);
     const [user, setUser] = useContext(UserContext);
@@ -30,19 +30,28 @@ function Signin({ setSignin }) {
         e.preventDefault();
         axios.post("/api/signin", info).then(res => {
             if (res.data.success) {
-                setUser({
-                    ...user,
-                    email: res.data.email,
-                    userId: res.data._id,
-                    token: res.data.token,
-                    darkModeOn: res.data.darkModeOn
-                });
-                history.push("/");
+                handleSignin(res.data);
             } else {
                 console.error(res.data.message);
                 handleErrors(res.data.error);
             };
+        }).catch(err => console.error(err));
+    };
+
+    const handleSignin = userData => {
+        if (user.darkModeOn !== null) {
+            const filter = { _id: userData._id };
+            const update = { darkModeOn: user.darkModeOn };
+            axios.post("/api/updateUser", { filter, update }).catch(err => console.error(err));
+        };
+
+        setUser({
+            ...user,
+            token: userData.token
         });
+
+        if (info.remember) localStorage.setItem("user_token", userData.token);
+        history.push("/");
     };
 
     const handleErrors = error => {
@@ -64,7 +73,7 @@ function Signin({ setSignin }) {
         };
     };
 
-    const handleChange = e => setInfo({ ...info, [e.target.name]: e.target.value });
+    const handleChange = e => setInfo({ ...info, [e.target.name]: e.target.checked ? e.target.checked : e.target.value });
 
     return (
         <form className={classes.form} noValidate onSubmit={handleSubmit}>
@@ -99,7 +108,7 @@ function Signin({ setSignin }) {
                 onChange={handleChange}
             />
             <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
+                control={<Checkbox name="remember" color="primary" onChange={handleChange} />}
                 label="Remember me"
             />
             <Button

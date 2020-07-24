@@ -14,11 +14,11 @@ const useStyles = makeStyles({
     }
 });
 
-function List(props) {
+function List({ characters, getCharacters }) {
     const classes = useStyles();
     return (
         <div className={classes.root}>
-            {props.characters.map(character => (
+            {characters.map(character => (
                 <Accordion key={character.name}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
@@ -36,7 +36,7 @@ function List(props) {
                     </AccordionSummary>
                     <AccordionDetails className={classes.accordianDetails}>
                         <Typography color="textSecondary">{character.description}</Typography>
-                        <Toolbar character={character} />
+                        <Toolbar character={character} getCharacters={getCharacters} />
                     </AccordionDetails>
                 </Accordion>
             ))}

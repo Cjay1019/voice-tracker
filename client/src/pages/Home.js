@@ -28,9 +28,9 @@ const useStyles = makeStyles(theme => ({
 function Home() {
     const [searchTerm, setSearch] = useState("");
     const [auth, setAuth] = useState(false);
-    const [characters, setCharacters] = useState([]);
+    const [characters, setCharacters] = useState(null);
     const [filteredCharacters, setFilteredCharacters] = useState(characters);
-    const [user] = useContext(UserContext);
+    const [user, setUser] = useContext(UserContext);
 
     const history = useHistory();
     const classes = useStyles();
@@ -39,31 +39,43 @@ function Home() {
         const results = await axios.get(`/verifyToken?secret_token=${user.token || ""}`);
         if (results.data.success) {
             console.log(results.data.message);
-
-            const characterList = await axios.post("/api/getCharacters", { userId: user.userId });
-
-            setCharacters(characterList.data);
+            setUser({
+                ...user,
+                email: results.data.user.email,
+                userId: results.data.user._id,
+                darkModeOn: user.darkModeOn !== null ? user.darkModeOn : results.data.user.darkModeOn
+            });
             setAuth(true);
         } else {
             console.error(results.data.message)
             history.push("/signin");
         };
-    }
+    };
+
+    const getCharacters = () => {
+        axios.post("/api/getCharacters", { userId: user.userId }).then(res => {
+            setCharacters(res.data);
+        });
+    };
 
     const handleChange = e => setSearch(e.target.value);
 
     useEffect(() => tokenIsValid(), []);
 
     useEffect(() => {
-        setFilteredCharacters(characters.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
+        if (characters) setFilteredCharacters(characters.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm]);
+
+    useEffect(() => {
+        if (auth) getCharacters();
+    }, [auth])
 
     return (
         <Container maxWidth="md">
-            {auth ?
+            {auth && characters?
                 <>
-                    <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search field" variant="outlined" />
-                    <List characters={filteredCharacters.length > 0 ? filteredCharacters : characters} />
+                    <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search by name" variant="outlined" />
+                    <List characters={searchTerm ? filteredCharacters : characters} getCharacters={getCharacters} />
                     <Tooltip TransitionComponent={Zoom} title="Add character" placement="left">
                         <Fab color="primary" aria-label="add" className={classes.fab} ><AddIcon /></Fab>
                     </Tooltip>
