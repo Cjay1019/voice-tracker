@@ -7,7 +7,7 @@ export const UserProvider = props => {
         email: "",
         userId: "",
         darkModeOn: null,
-        token: ""
+        auth: false
     });
     return (
         <UserContext.Provider value={[user, setUser]}>

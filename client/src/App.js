@@ -14,10 +14,24 @@ function App() {
   const [user, setUser] = useContext(UserContext);
 
   useEffect(() => {
-    const userToken = localStorage.getItem("user_token");
-    if (userToken) setUser({ ...user, token: userToken });
-    checkForToken(true);
+    axios.get(`/verifyToken`).then(res => {
+      if (res.data.success) {
+        setUser({
+          ...user,
+          name: res.data.user.name,
+          email: res.data.user.email,
+          userId: res.data.user._id,
+          auth: true,
+          darkModeOn: res.data.user.darkModeOn
+        });
+        setUser({...user, auth: true})
+      } else setUser({...user, auth: false})
+    });
   }, []);
+
+  useEffect(() => {
+    if (user.auth !== null) checkForToken(true);
+  }, [user.auth]);
 
   const theme = createMuiTheme({
     palette: {
@@ -29,7 +43,7 @@ function App() {
     <>
       {checked ?
         <ThemeProvider theme={theme}>
-          < CssBaseline />
+          <CssBaseline />
           <Navbar />
           <Router>
             <Switch>
@@ -37,7 +51,7 @@ function App() {
                 <Landing />
               </Route>
               <Route path="/" render={() => (
-                user.token ? <Home /> : <Redirect to="/signin"></Redirect>
+                user.auth ? <Home /> : <Redirect to="/signin"></Redirect>
               )}>
               </Route>
             </Switch>

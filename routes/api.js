@@ -36,13 +36,6 @@ module.exports = function (app) {
         });
     });
 
-    app.post("/api/getCharacters", (req, res) => {
-        Character.find(req.body, (err, characters) => {
-            if (err) res.json(err);
-            res.json(characters);
-        });
-    });
-
     app.post("/api/signin", (req, res, next) => {
         passport.authenticate("login", (err, user, info) => {
             if (err) return res.json(err);
@@ -52,13 +45,9 @@ module.exports = function (app) {
                 const body = { _id: user._id, email: user.email }
                 jwt.sign({ user: body }, process.env.JWT_SECRET, (err, token) => {
                     if (err) return next(res.json(err));
-                    res.cookie("jwt", token, {
-                        httpOnly: true,
-                        sameSite: true,
-                        signed: true,
-                        secure: true
-                    });
-                    return res.json({ success: true, token, darkModeOn: user.darkModeOn, email: user.email, _id: user._id });
+                    res.cookie("jwt", token, { httpOnly: true, sameSite: true });
+                    delete user.password;
+                    return res.json({ success: true, token, user });
                 });
             });
         })(req, res, next);

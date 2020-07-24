@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 function Home() {
     const [searchTerm, setSearch] = useState("");
-    const [auth, setAuth] = useState(false);
+    // const [auth, setAuth] = useState(false);
     const [characters, setCharacters] = useState(null);
     const [filteredCharacters, setFilteredCharacters] = useState(characters);
     const [user, setUser] = useContext(UserContext);
@@ -35,44 +35,45 @@ function Home() {
     const history = useHistory();
     const classes = useStyles();
 
-    const tokenIsValid = async () => {
-        const results = await axios.get(`/verifyToken?secret_token=${user.token || ""}`);
-        if (results.data.success) {
-            console.log(results.data.message);
-            setUser({
-                ...user,
-                email: results.data.user.email,
-                userId: results.data.user._id,
-                darkModeOn: user.darkModeOn !== null ? user.darkModeOn : results.data.user.darkModeOn
-            });
-            setAuth(true);
-        } else {
-            console.error(results.data.message)
-            history.push("/signin");
-        };
-    };
+    // const tokenIsValid = async () => {
+    //     const results = await axios.get(`/verifyToken`);
+    //     if (results.data.success) {
+    //         console.log(results.data.message);
+    //         // setUser({
+    //         //     ...user,
+    //         //     name: results.data.user.name,
+    //         //     email: results.data.user.email,
+    //         //     userId: results.data.user._id,
+    //         //     darkModeOn: user.darkModeOn !== null ? user.darkModeOn : results.data.user.darkModeOn
+    //         // });
+    //         setAuth(true);
+    //     } else {
+    //         console.error(results.data.message)
+    //         history.push("/signin");
+    //     };
+    // };
 
     const getCharacters = () => {
         axios.post("/api/getCharacters", { userId: user.userId }).then(res => {
             setCharacters(res.data);
-        });
+        }).catch(err => console.error(err));
     };
 
     const handleChange = e => setSearch(e.target.value);
 
-    useEffect(() => tokenIsValid(), []);
+    // useEffect(() => tokenIsValid(), []);
 
     useEffect(() => {
         if (characters) setFilteredCharacters(characters.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
     }, [searchTerm]);
 
     useEffect(() => {
-        if (auth) getCharacters();
-    }, [auth])
+        getCharacters();
+    }, [])
 
     return (
         <Container maxWidth="md">
-            {auth && characters?
+            {characters ?
                 <>
                     <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search by name" variant="outlined" />
                     <List characters={searchTerm ? filteredCharacters : characters} getCharacters={getCharacters} />

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { makeStyles, Link, Grid, Button, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import axios from "axios";
@@ -26,11 +26,15 @@ function Signin({ setSignin }) {
     const [passwordError, setPasswordError] = useState(null);
     const [user, setUser] = useContext(UserContext);
 
+    useEffect(() => {
+        if (user.auth) history.push("/");
+    }, [user.auth])
+
     const handleSubmit = e => {
         e.preventDefault();
         axios.post("/api/signin", info).then(res => {
             if (res.data.success) {
-                handleSignin(res.data);
+                handleSignin(res.data.user);
             } else {
                 console.error(res.data.message);
                 handleErrors(res.data.error);
@@ -47,11 +51,12 @@ function Signin({ setSignin }) {
 
         setUser({
             ...user,
-            token: userData.token
+            name: userData.name,
+            userId: userData._id,
+            email: userData.email,
+            auth: true,
+            darkModeOn: user.darkModeOn !== null ? user.darkModeOn : userData.darkModeOn
         });
-
-        if (info.remember) localStorage.setItem("user_token", userData.token);
-        history.push("/");
     };
 
     const handleErrors = error => {
