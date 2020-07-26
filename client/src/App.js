@@ -24,7 +24,6 @@ function App() {
           auth: true,
           darkModeOn: res.data.user.darkModeOn
         });
-        setUser({...user, auth: true})
       } else setUser({...user, auth: false})
     });
   }, []);
@@ -50,9 +49,7 @@ function App() {
               <Route path="/signin">
                 <Landing />
               </Route>
-              <Route path="/" render={() => (
-                user.auth ? <Home /> : <Redirect to="/signin"></Redirect>
-              )}>
+              <Route path="/" render={() => user.auth ? <Home /> : <Redirect to="/signin"></Redirect>}>
               </Route>
             </Switch>
           </Router>

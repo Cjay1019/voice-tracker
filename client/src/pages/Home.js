@@ -55,6 +55,7 @@ function Home() {
 
     const getCharacters = () => {
         axios.post("/api/getCharacters", { userId: user.userId }).then(res => {
+            console.log(res)
             setCharacters(res.data);
         }).catch(err => console.error(err));
     };
@@ -64,12 +65,11 @@ function Home() {
     // useEffect(() => tokenIsValid(), []);
 
     useEffect(() => {
-        if (characters) setFilteredCharacters(characters.filter(character => character.name.toLowerCase().includes(searchTerm.toLowerCase())));
+        if (characters) setFilteredCharacters(characters.filter(character => (
+            character.name.toLowerCase().includes(searchTerm.toLowerCase()))));
     }, [searchTerm]);
 
-    useEffect(() => {
-        getCharacters();
-    }, [])
+    useEffect(() => getCharacters(), []);
 
     return (
         <Container maxWidth="md">
