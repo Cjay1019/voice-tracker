@@ -43,11 +43,10 @@ function Signin({ setSignin }) {
     };
 
     const handleSignin = userData => {
-        if (user.darkModeOn !== null) {
             const filter = { _id: userData._id };
-            const update = { darkModeOn: user.darkModeOn };
+            const update = { staySignedIn: info.remember };
+            if (user.darkModeOn !== null) update = {...update, darkModeOn: user.darkModeOn };
             axios.post("/api/updateUser", { filter, update }).catch(err => console.error(err));
-        };
 
         setUser({
             ...user,

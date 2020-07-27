@@ -20,6 +20,10 @@ let userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    staySignedIn: {
+        type: Boolean,
+        default: false
     }
 });
 

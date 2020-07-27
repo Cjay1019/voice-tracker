@@ -15,7 +15,7 @@ function App() {
 
   useEffect(() => {
     axios.get(`/verifyToken`).then(res => {
-      if (res.data.success) {
+      if (res.data.success && res.data.user.staySignedIn) {
         setUser({
           ...user,
           name: res.data.user.name,

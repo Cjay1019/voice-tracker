@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import List from "../components/List";
+import CharacterForm from "../components/CharacterForm";
 import { TextField, Container, makeStyles, CircularProgress, Fab, Tooltip, Zoom } from '@material-ui/core/';
 import AddIcon from "@material-ui/icons/Add";
 import { useHistory } from "react-router-dom";
@@ -27,42 +28,23 @@ const useStyles = makeStyles(theme => ({
 
 function Home() {
     const [searchTerm, setSearch] = useState("");
-    // const [auth, setAuth] = useState(false);
     const [characters, setCharacters] = useState(null);
-    const [filteredCharacters, setFilteredCharacters] = useState(characters);
-    const [user, setUser] = useContext(UserContext);
+    const [filteredCharacters, setFilteredCharacters] = useState([]);
+    const [formOpen, setFormOpen] = useState(false);
+    const [user] = useContext(UserContext);
 
     const history = useHistory();
     const classes = useStyles();
 
-    // const tokenIsValid = async () => {
-    //     const results = await axios.get(`/verifyToken`);
-    //     if (results.data.success) {
-    //         console.log(results.data.message);
-    //         // setUser({
-    //         //     ...user,
-    //         //     name: results.data.user.name,
-    //         //     email: results.data.user.email,
-    //         //     userId: results.data.user._id,
-    //         //     darkModeOn: user.darkModeOn !== null ? user.darkModeOn : results.data.user.darkModeOn
-    //         // });
-    //         setAuth(true);
-    //     } else {
-    //         console.error(results.data.message)
-    //         history.push("/signin");
-    //     };
-    // };
-
     const getCharacters = () => {
         axios.post("/api/getCharacters", { userId: user.userId }).then(res => {
-            console.log(res)
             setCharacters(res.data);
         }).catch(err => console.error(err));
     };
 
     const handleChange = e => setSearch(e.target.value);
 
-    // useEffect(() => tokenIsValid(), []);
+    const handleFormOpen = () => setFormOpen(true);
 
     useEffect(() => {
         if (characters) setFilteredCharacters(characters.filter(character => (
@@ -78,8 +60,9 @@ function Home() {
                     <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search by name" variant="outlined" />
                     <List characters={searchTerm ? filteredCharacters : characters} getCharacters={getCharacters} />
                     <Tooltip TransitionComponent={Zoom} title="Add character" placement="left">
-                        <Fab color="primary" aria-label="add" className={classes.fab} ><AddIcon /></Fab>
+                        <Fab color="primary" aria-label="add" className={classes.fab} onClick={handleFormOpen}><AddIcon /></Fab>
                     </Tooltip>
+                    <CharacterForm formOpen={formOpen} setFormOpen={setFormOpen} />
                 </>
                 :
                 <CircularProgress className={classes.spinner} />}
