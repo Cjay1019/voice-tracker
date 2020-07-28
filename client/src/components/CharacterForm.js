@@ -17,6 +17,7 @@ function CharacterForm({ formOpen, setFormOpen }) {
                 <TextField
                     autoFocus
                     margin="dense"
+                    variant="outlined"
                     id="name"
                     label="Email Address"
                     type="email"

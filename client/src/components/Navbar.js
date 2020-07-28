@@ -31,6 +31,19 @@ function Navbar() {
         setUser({ ...user, darkModeOn: !user.darkModeOn });
     };
 
+    const logOut = () => {
+        const filter = { _id: user.userId };
+        let update = { staySignedIn: false };
+        axios.post("/api/updateUser", { filter, update }).then(res => {
+            setUser({
+                email: "",
+                userId: "",
+                darkModeOn: null,
+                auth: null
+            });
+        }).catch(err => console.error(err));
+    };
+
     return (
         <AppBar position="static">
             <Toolbar>
@@ -40,7 +53,7 @@ function Navbar() {
                         {user.darkModeOn ? <Brightness7Icon /> : <Brightness4Icon />}
                     </Button>
                 </Tooltip>
-                <Button color="inherit">Login</Button>
+                {user.auth ? <Button color="inherit" onClick={logOut}>Logout</Button> : null}
             </Toolbar>
         </AppBar>
     );
