@@ -1,6 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import { makeStyles, Link, Grid, Button, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -17,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 function Signin({ setSignin }) {
     const classes = useStyles();
+    const history = useHistory();
 
     const [user, setUser] = useContext(UserContext);
     const [info, setInfo] = useState({ firstName: "", lastName: "", email: "", password: "", confirm: "", remember: false });
@@ -30,7 +33,7 @@ function Signin({ setSignin }) {
 
     const handleSubmit = e => {
         e.preventDefault();
-        const newUser = { name: `${info.firstName} ${lastName}`, email: info.email, password: info.password };
+        const newUser = { name: `${info.firstName} ${info.lastName}`, email: info.email, password: info.password };
         newUser.darkModeOn = user.darkModeOn !== null ? user.darkModeOn : false;
         axios.post("/api/signup", newUser).then(res => {
             if (res.data.success) {
@@ -38,7 +41,7 @@ function Signin({ setSignin }) {
                 // handleSignup(res.data.user);
             } else {
                 console.error(res.data.message);
-                handleErrors(res.data.error);
+                // handleErrors(res.data.error);
             };
         }).catch(err => console.error(err));
     };
@@ -80,7 +83,7 @@ function Signin({ setSignin }) {
                     <TextField
                         autoComplete="lname"
                         name="lastName"
-                        value={info.password}
+                        value={info.lastName}
                         variant="outlined"
                         required
                         fullWidth
@@ -93,7 +96,7 @@ function Signin({ setSignin }) {
                     <TextField
                         autoComplete="email"
                         name="email"
-                        value={info.password}
+                        value={info.email}
                         variant="outlined"
                         required
                         fullWidth
@@ -118,7 +121,7 @@ function Signin({ setSignin }) {
                 <Grid item xs={12}>
                     <TextField
                         name="confirm"
-                        value={info.password}
+                        value={info.confirm}
                         variant="outlined"
                         required
                         fullWidth
