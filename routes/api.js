@@ -6,14 +6,15 @@ const User = require('../models/user');
 
 
 module.exports = function (app) {
-    app.post("/api/signup",
-        passport.authenticate("signup", { session: false }), (req, res) => {
-            console.log(req.user)
+    app.post("/api/signup", (req, res) => {
+        passport.authenticate("signup", { session: false }, (err, user, info) => {
+            console.log("ayy", info)
             res.json({
                 success: true,
                 user: req.user
             });
-        });
+        })(req, res);
+    });
 
     app.post("/api/createCharacter", (req, res) => {
         Character.create(req.body, (err, user) => {

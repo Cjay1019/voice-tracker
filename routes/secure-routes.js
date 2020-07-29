@@ -8,9 +8,13 @@ module.exports = function (app) {
         passport.authenticate("jwt", { session: false }, (err, token, info) => {
             if (token.iat) {
                 User.findOne({ _id: token.user._id }, (err, user) => {
-                    if (err) console.error(err);
-                    delete user.password;
-                    res.json({ success: true, message: "Token authenticated", user });
+                    if (err) res.json(err);
+                    if (user) {
+                        delete user.password;
+                        res.json({ success: true, message: "Token authenticated", user });
+                    } else {
+                        res.json({success: false, message: "User associated with token not found"})
+                    }
                 });
             } else if (info) res.json({ success: false, message: info.message });
         })(req, res, next);

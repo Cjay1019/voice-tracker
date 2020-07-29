@@ -4,7 +4,7 @@ import { UserContext } from "../contexts/UserContext";
 import { makeStyles, Link, Grid, Button, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import axios from "axios";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     form: {
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(3),
@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function Signin({ setSignin }) {
+function Signup({ setSignin }) {
     const classes = useStyles();
     const history = useHistory();
 
     const [user, setUser] = useContext(UserContext);
     const [info, setInfo] = useState({ firstName: "", lastName: "", email: "", password: "", confirm: "", remember: false });
+    const [firstNameError, setfirstNameError] = useState(null);
+    const [lastNameError, setlastNameError] = useState(null);
+    const [emailError, setemailError] = useState(null);
+    const [passwordError, setpasswordError] = useState(null);
+    const [confirmError, setconfirmError] = useState(null);
 
     useEffect(() => {
         if (user.auth) history.push("/");
@@ -33,20 +38,34 @@ function Signin({ setSignin }) {
 
     const handleSubmit = e => {
         e.preventDefault();
-        const newUser = { name: `${info.firstName} ${info.lastName}`, email: info.email, password: info.password };
-        newUser.darkModeOn = user.darkModeOn !== null ? user.darkModeOn : false;
-        axios.post("/api/signup", newUser).then(res => {
+        if (info.firstName && info.lastName && info.email && info.password && info.confirm && info.password === info.confirm) {
+            const newUser = { name: `${info.firstName} ${info.lastName}`, email: info.email, password: info.password };
+            newUser.darkModeOn = user.darkModeOn !== null ? user.darkModeOn : false;
+            axios.post("/api/signup", newUser).then(res => {
+                if (res.data.success) {
+                    console.log(res.data)
+                    handleSignup();
+                } else {
+                    console.error(res.data.message);
+                    handleErrors(res.data.error);
+                };
+            }).catch(err => console.error(err));
+        } else handleErrors(9999);
+    };
+
+    const handleSignup = () => {
+        axios.post("/api/signin", info).then(res => {
             if (res.data.success) {
-                console.log(res.data)
-                // handleSignup(res.data.user);
+                handleSignin(res.data.user);
             } else {
                 console.error(res.data.message);
-                // handleErrors(res.data.error);
+                handleErrors(res.data.error);
             };
         }).catch(err => console.error(err));
     };
 
-    const handleSignup = userData => {
+    // TODO: maybe consolidate this duplicate
+    const handleSignin = userData => {
         const filter = { _id: userData._id };
         const update = { staySignedIn: info.remember };
         if (user.darkModeOn !== null) update = { ...update, darkModeOn: user.darkModeOn };
@@ -62,11 +81,41 @@ function Signin({ setSignin }) {
         });
     };
 
+    const handleErrors = error => {
+        // TODO: maybe tidy this up
+        info.firstName ? setfirstNameError(null) : setfirstNameError("Enter an first name");
+        info.lastName ? setlastNameError(null) : setlastNameError("Enter an last name");
+        info.email ? setemailError(null) : setemailError("Enter an email");
+        if (!info.password) {
+            setpasswordError("Enter a password");
+            setconfirmError(null);
+        } else if (!info.confirm) {
+            setpasswordError(null);
+            setconfirmError("Please confirm your password");
+        } else if (info.password !== info.confirm) {
+            setpasswordError(null);
+            setconfirmError("Passwords do not match");
+        } else {
+            setpasswordError(null);
+            setconfirmError(null);
+        };
+
+        switch (error) {
+            
+            case 9999:
+                break;
+            default:
+                return console.error("Unknown error code");
+        };
+    };
+
     return (
         <form className={classes.form} noValidate onSubmit={handleSubmit}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                     <TextField
+                        error={firstNameError ? true : false}
+                        helperText={firstNameError ? firstNameError : ""}
                         autoFocus
                         autoComplete="fname"
                         name="firstName"
@@ -81,6 +130,8 @@ function Signin({ setSignin }) {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                     <TextField
+                        error={lastNameError ? true : false}
+                        helperText={lastNameError ? lastNameError : ""}
                         autoComplete="lname"
                         name="lastName"
                         value={info.lastName}
@@ -94,6 +145,8 @@ function Signin({ setSignin }) {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
+                        error={emailError ? true : false}
+                        helperText={emailError ? emailError : ""}
                         autoComplete="email"
                         name="email"
                         value={info.email}
@@ -107,6 +160,8 @@ function Signin({ setSignin }) {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
+                        error={passwordError ? true : false}
+                        helperText={passwordError ? passwordError : ""}
                         name="password"
                         value={info.password}
                         variant="outlined"
@@ -120,6 +175,8 @@ function Signin({ setSignin }) {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
+                        error={confirmError ? true : false}
+                        helperText={confirmError ? confirmError : ""}
                         name="confirm"
                         value={info.confirm}
                         variant="outlined"
@@ -158,4 +215,4 @@ function Signin({ setSignin }) {
     )
 };
 
-export default Signin;
+export default Signup;

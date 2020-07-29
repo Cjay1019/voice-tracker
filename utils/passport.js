@@ -10,7 +10,9 @@ passport.use("signup", new localStrategy({
 }, (req, email, password, done) => {
     console.log(req.body)
     User.create(req.body, (err, user) => {
-        if (err) return done(err);
+        console.log(err, user)
+        // if (err) return done(res.json(err));
+        if (!user) return done(null, false, {message: "test"})
         return done(null, user)
     });
 }));

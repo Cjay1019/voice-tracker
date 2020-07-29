@@ -5,7 +5,7 @@ import Signin from "../components/Signin";
 import Signup from "../components/Signup";
 import Copyright from "../components/Copyright";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         height: "100vh"
     },
