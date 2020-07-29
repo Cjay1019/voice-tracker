@@ -10,7 +10,7 @@ module.exports = function (app) {
         passport.authenticate("signup", { session: false }), (req, res) => {
             console.log(req.user)
             res.json({
-                message: 'Signup successful',
+                success: true,
                 user: req.user
             });
         });

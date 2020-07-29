@@ -8,8 +8,7 @@ passport.use("signup", new localStrategy({
     passwordField: "password",
     passReqToCallback: true
 }, (req, email, password, done) => {
-    req.body.email = email;
-    req.body.password = password;
+    console.log(req.body)
     User.create(req.body, (err, user) => {
         if (err) return done(err);
         return done(null, user)

@@ -28,7 +28,7 @@ function Signin({ setSignin }) {
 
     useEffect(() => {
         if (user.auth) history.push("/");
-    }, [user.auth])
+    }, [user.auth]);
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -43,10 +43,10 @@ function Signin({ setSignin }) {
     };
 
     const handleSignin = userData => {
-            const filter = { _id: userData._id };
-            const update = { staySignedIn: info.remember };
-            if (user.darkModeOn !== null) update = {...update, darkModeOn: user.darkModeOn };
-            axios.post("/api/updateUser", { filter, update }).catch(err => console.error(err));
+        const filter = { _id: userData._id };
+        const update = { staySignedIn: info.remember };
+        if (user.darkModeOn !== null) update = { ...update, darkModeOn: user.darkModeOn };
+        axios.post("/api/updateUser", { filter, update }).catch(err => console.error(err));
 
         setUser({
             ...user,
@@ -84,36 +84,36 @@ function Signin({ setSignin }) {
             <TextField
                 error={emailError ? true : false}
                 helperText={emailError ? emailError : ""}
+                autoFocus
+                autoComplete="email"
+                name="email"
+                value={info.email}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
-                name="email"
-                value={info.email}
-                autoComplete="email"
-                autoFocus
                 onChange={handleChange}
             />
             <TextField
                 error={passwordError ? true : false}
                 helperText={passwordError ? passwordError : ""}
+                autoComplete="current-password"
+                name="password"
+                value={info.password}
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                name="password"
-                value={info.password}
                 label="Password"
                 type="password"
                 id="password"
-                autoComplete="current-password"
                 onChange={handleChange}
             />
             <FormControlLabel
                 control={<Checkbox name="remember" color="primary" onChange={handleChange} />}
-                label="Remember me"
+                label="Keep me signed in"
             />
             <Button
                 type="submit"
