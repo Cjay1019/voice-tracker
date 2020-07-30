@@ -8,11 +8,8 @@ const User = require('../models/user');
 module.exports = function (app) {
     app.post("/api/signup", (req, res) => {
         passport.authenticate("signup", { session: false }, (err, user, info) => {
-            console.log("ayy", info)
-            res.json({
-                success: true,
-                user: req.user
-            });
+            if (info) res.json({ ...info, success: false });
+            else res.json({ success: true, user: req.user });
         })(req, res);
     });
 

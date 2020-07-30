@@ -23,11 +23,11 @@ function Signup({ setSignin }) {
 
     const [user, setUser] = useContext(UserContext);
     const [info, setInfo] = useState({ firstName: "", lastName: "", email: "", password: "", confirm: "", remember: false });
-    const [firstNameError, setfirstNameError] = useState(null);
-    const [lastNameError, setlastNameError] = useState(null);
-    const [emailError, setemailError] = useState(null);
-    const [passwordError, setpasswordError] = useState(null);
-    const [confirmError, setconfirmError] = useState(null);
+    const [firstNameError, setFirstNameError] = useState(null);
+    const [lastNameError, setLastNameError] = useState(null);
+    const [emailError, setEmailError] = useState(null);
+    const [passwordError, setPasswordError] = useState(null);
+    const [confirmError, setConfirmError] = useState(null);
 
     useEffect(() => {
         if (user.auth) history.push("/");
@@ -83,25 +83,39 @@ function Signup({ setSignin }) {
 
     const handleErrors = error => {
         // TODO: maybe tidy this up
-        info.firstName ? setfirstNameError(null) : setfirstNameError("Enter an first name");
-        info.lastName ? setlastNameError(null) : setlastNameError("Enter an last name");
-        info.email ? setemailError(null) : setemailError("Enter an email");
+        info.firstName ? setFirstNameError(null) : setFirstNameError("Enter an first name");
+        info.lastName ? setLastNameError(null) : setLastNameError("Enter an last name");
+        info.email ? setEmailError(null) : setEmailError("Enter an email");
         if (!info.password) {
-            setpasswordError("Enter a password");
-            setconfirmError(null);
+            setPasswordError("Enter a password");
+            setConfirmError(null);
         } else if (!info.confirm) {
-            setpasswordError(null);
-            setconfirmError("Please confirm your password");
+            setPasswordError(null);
+            setConfirmError("Please confirm your password");
         } else if (info.password !== info.confirm) {
-            setpasswordError(null);
-            setconfirmError("Passwords do not match");
+            setPasswordError(null);
+            setConfirmError("Passwords do not match");
         } else {
-            setpasswordError(null);
-            setconfirmError(null);
+            setPasswordError(null);
+            setConfirmError(null);
         };
 
         switch (error) {
-            
+            case 1003:
+                setEmailError("Enter a valid email address");
+                break;
+            case 1004:
+                setPasswordError("Password must have 1 lowercase letter");
+                break;
+            case 1005:
+                setPasswordError("Password must have 1 number");
+                break;
+            case 1006:
+                setPasswordError("Password must be at least 8 characters");
+                break;
+            case 1007:
+                setEmailError("This email address is already registered");
+                break;
             case 9999:
                 break;
             default:

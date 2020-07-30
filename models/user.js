@@ -15,11 +15,17 @@ let userSchema = new Schema({
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        validate: [{ validator: v => /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(v), msg: "Invalid email", error: 1003 }]
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        validate: [
+            { validator: v => /(?=.*[a-z])/.test(v), msg: "Invalid password", error: 1004 },
+            { validator: v => /(?=.*[0-9])/.test(v), msg: "Invalid password", error: 1005 },
+            { validator: v => /(?=.{8,})/.test(v), msg: "Invalid password", error: 1006 }
+        ]
     },
     staySignedIn: {
         type: Boolean,

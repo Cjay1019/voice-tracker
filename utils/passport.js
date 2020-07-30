@@ -8,12 +8,13 @@ passport.use("signup", new localStrategy({
     passwordField: "password",
     passReqToCallback: true
 }, (req, email, password, done) => {
-    console.log(req.body)
     User.create(req.body, (err, user) => {
-        console.log(err, user)
-        // if (err) return done(res.json(err));
-        if (!user) return done(null, false, {message: "test"})
-        return done(null, user)
+        if (err && err.errors && err.errors.email) {
+            return done(null, false, { message: err.errors.email.properties.msg, error: err.errors.email.properties.error });
+        } else if (err && err.errors && err.errors.password) {
+            return done(null, false, { message: err.errors.password.properties.msg, error: err.errors.password.properties.error });
+        } else if (err && err.code === 11000) return done(null, false, { message: "Duplicate email", error: 1007 });
+        else return done(null, user);
     });
 }));
 
@@ -24,12 +25,12 @@ passport.use("login", new localStrategy({
 
     User.findOne({ "email": email }, (err, user) => {
         if (err) return done(error);
-        if (!user) return done(null, false, { message: "User not found", error: 1000 });
+        if (!user) return done(null, false, { success: false, message: "User not found", error: 1000 });
         else {
             user.isValidPassword(password, (err, match) => {
                 if (err) return done(error);
-                if (!match) return done(null, false, { message: "Incorrect Password", error: 1001 });
-                else return done(null, user, { message: "Logged in Successfully" });
+                if (!match) return done(null, false, { success: false, message: "Incorrect Password", error: 1001 });
+                else return done(null, user, { success: true, message: "Logged in Successfully" });
             })
         }
     });
