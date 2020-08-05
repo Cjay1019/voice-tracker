@@ -3,6 +3,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const Character = require('../models/character');
 const User = require('../models/user');
+const fs = require("fs");
 
 
 module.exports = function (app) {
@@ -14,9 +15,21 @@ module.exports = function (app) {
     });
 
     app.post("/api/createCharacter", (req, res) => {
-        Character.create(req.body, (err, user) => {
+        const fileUrl = `/audio/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
+        fs.mkdir(`client/public/audio/${req.body.user.email}`, { recursive: true }, (err) => {
+            fs.createWriteStream(`client/public${fileUrl}`).write(new Buffer.from(req.body.buffer));
+        });
+
+        const newCharacter = {
+            name: req.body.character.name,
+            description: req.body.character.description,
+            userId: req.body.user.userId,
+            fileUrl
+        };
+
+        Character.create(newCharacter, (err, character) => {
             if (err) res.json(err);
-            res.json(user);
+            res.json({ success: true, character });
         });
     });
 

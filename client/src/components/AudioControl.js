@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function AudioControl(props) {
+function AudioControl({ fileUrl }) {
     const classes = useStyles();
     const rap = useRef();
     const [isPlaying, setPlaying] = useState(false);
@@ -26,7 +26,7 @@ function AudioControl(props) {
 
     return (
         <>
-            <ReactAudioPlayer src={props.fileName} ref={rap} />
+            <ReactAudioPlayer src={fileUrl} ref={rap} />
             <Button onClick={event => playPause(event)}>
                 {isPlaying ?
                     <PauseCircleFilledIcon className={classes.audioButton} />

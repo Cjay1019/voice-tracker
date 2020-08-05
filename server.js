@@ -7,20 +7,21 @@ const mongoose = require("mongoose");
 
 
 // Define middleware here
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 // Serve up static assets
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static("./client/build"));
+    app.use(express.static(path.join(__dirname, "/client/build")));
     require('dotenv').config();
     console.log("env success");
 };
+app.use(express.static(path.join(__dirname, "/client/public/audio")));
 
 require("./utils/passport");
 require("./routes/api.js")(app);
 require("./routes/secure-routes.js")(app);
-app.get("*", (req, res) => res.sendFile(path.join(__dirname, "./client/build/index.html")));
+app.get("*", (req, res) => res.sendFile(path.join(__dirname, "/client/build/index.html")));
 
 
 

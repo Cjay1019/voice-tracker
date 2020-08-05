@@ -30,7 +30,7 @@ function List({ characters, getCharacters }) {
                             aria-label="Acknowledge"
                             onClick={event => event.stopPropagation()}
                             onFocus={event => event.stopPropagation()}
-                            control={<AudioControl fileName="phoebe.mp3" />}
+                            control={<AudioControl fileUrl={character.fileUrl} />}
                             label={character.name}
                         />
                     </AccordionSummary>
