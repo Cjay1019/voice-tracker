@@ -4,15 +4,26 @@ import { UserContext } from "../contexts/UserContext";
 import MicRecorder from "mic-recorder-to-mp3";
 import axios from "axios";
 import RecordPulse from "./RecordPulse";
-import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@material-ui/core';
+import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles } from '@material-ui/core';
 
+const useStyles = makeStyles({
+    audioContainer: {
+        width: "24px",
+        display: "inline-block"
+    },
+    recordButton: {
+        width: "64px"
+    }
+});
 
 const Mp3Recorder = new MicRecorder({ bitRate: 320 });
+
 function CharacterForm({ formOpen, setFormOpen }) {
+    const classes = useStyles();
     const [user] = useContext(UserContext);
     const [characterInfo, setCharacterInfo] = useState({ name: "", description: "" });
     const [isRecording, setRecording] = useState(false);
-    const [audio, setAudio] = useState({ blobUrl: "", blob: null });
+    const [audio, setAudio] = useState({ blobUrl: "", buffer: null });
     const [isBlocked, setBlocked] = useState(false);
 
     useEffect(() => {
@@ -23,6 +34,7 @@ function CharacterForm({ formOpen, setFormOpen }) {
 
     const handleChange = e => setCharacterInfo({ ...characterInfo, [e.target.name]: e.target.value });
 
+    const readyToCreate = () => !isRecording && audio.buffer;
 
     const startRecording = () => {
         if (!isBlocked) {
@@ -32,13 +44,10 @@ function CharacterForm({ formOpen, setFormOpen }) {
 
     const stopRecording = () => {
         Mp3Recorder.stop().getMp3().then(([buffer, blob]) => {
-            // const file = new File(buffer, 'me-at-thevoice.mp3', {
-            //     type: blob.type,
-            //     lastModified: Date.now()
-            // });
-            setAudio({ blobUrl: URL.createObjectURL(blob), buffer });
-            console.log(typeof buffer)
-            setRecording(false);
+            blob.arrayBuffer().then(arrayBuffer => {
+                setAudio({ blobUrl: URL.createObjectURL(blob), buffer: Buffer.from(arrayBuffer) });
+                setRecording(false);
+            });
         }).catch(e => console.error(e))
     };
 
@@ -49,6 +58,7 @@ function CharacterForm({ formOpen, setFormOpen }) {
         });
         handleClose();
     };
+
 
     return (
         <Dialog open={formOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
@@ -82,19 +92,21 @@ function CharacterForm({ formOpen, setFormOpen }) {
                     fullWidth
                     onChange={handleChange}
                 />
-                <Button onClick={isRecording ? stopRecording : startRecording}>
+                <Button onClick={isRecording ? stopRecording : startRecording} className={classes.recordButton}>
                     {isRecording ? "Stop" : "Record"}
                 </Button>
+                <div className={classes.audioContainer}>
+                    {readyToCreate() && <AudioControl fileUrl={audio.blobUrl} />}
+                </div>
                 {/* <RecordPulse /> */}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="primary">
                     Cancel
           </Button>
-                <Button onClick={handleCreate} color="primary">
+                <Button onClick={handleCreate} color="primary" disabled={!readyToCreate()}>
                     Create
           </Button>
-                <AudioControl fileName={audio.blobUrl} />
             </DialogActions>
         </Dialog>
     )

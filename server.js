@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "production") {
 };
 
 // Configure client for use with Spaces
-const spacesEndpoint = new AWS.Endpoint(process.env.AWS_ENDPOINT);
+const spacesEndpoint = new AWS.Endpoint("nyc3.digitaloceanspaces.com");
 const s3 = new AWS.S3({
     endpoint: spacesEndpoint,
     accessKeyId: process.env.AWS_KEY,

@@ -3,7 +3,6 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const Character = require('../models/character');
 const User = require('../models/user');
-const fs = require("fs");
 
 module.exports = function (app, s3) {
     app.post("/api/signup", (req, res) => {
@@ -14,15 +13,13 @@ module.exports = function (app, s3) {
     });
 
     app.post("/api/createCharacter", (req, res) => {
-        const fileUrl = `/files/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
-        // fs.mkdir(`${__dirname}../files/${req.body.user.email}`, { recursive: true }, (err) => {
-        //     fs.createWriteStream(`__dirname + fileUrl`).write();
-        // });
-        console.log(typeof req.body.buffer)
+        const fileUrl = `https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
+
         const params = {
-            Body: new TextDecoder("utf-8").decode(new Uint8Array(req.body.buffer)),
-            Bucket: "voicetracker",
-            Key: "test.mp3",
+            ACL: "public-read",
+            Body: Buffer.from(Uint8Array.from(req.body.buffer.data)),
+            Bucket: process.env.AWS_BUCKET,
+            Key: `${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`,
         };
 
         s3.putObject(params, (err, data) => {
