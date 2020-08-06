@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
+const AWS = require("aws-sdk");
 
 
 // Define middleware here
@@ -13,13 +14,21 @@ app.use(cookieParser());
 // Serve up static assets
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/client/build")));
+    app.use(express.static(path.join(__dirname, "/files")));
     require('dotenv').config();
     console.log("env success");
 };
-app.use(express.static(path.join(__dirname, "/client/public/audio")));
+
+// Configure client for use with Spaces
+const spacesEndpoint = new AWS.Endpoint(process.env.AWS_ENDPOINT);
+const s3 = new AWS.S3({
+    endpoint: spacesEndpoint,
+    accessKeyId: process.env.AWS_KEY,
+    secretAccessKey: process.env.AWS_SECRET
+});
 
 require("./utils/passport");
-require("./routes/api.js")(app);
+require("./routes/api.js")(app, s3);
 require("./routes/secure-routes.js")(app);
 app.get("*", (req, res) => res.sendFile(path.join(__dirname, "/client/build/index.html")));
 

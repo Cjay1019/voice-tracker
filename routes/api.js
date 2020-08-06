@@ -5,8 +5,7 @@ const Character = require('../models/character');
 const User = require('../models/user');
 const fs = require("fs");
 
-
-module.exports = function (app) {
+module.exports = function (app, s3) {
     app.post("/api/signup", (req, res) => {
         passport.authenticate("signup", { session: false }, (err, user, info) => {
             if (info) res.json({ ...info, success: false });
@@ -15,9 +14,20 @@ module.exports = function (app) {
     });
 
     app.post("/api/createCharacter", (req, res) => {
-        const fileUrl = `/audio/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
-        fs.mkdir(`client/public/audio/${req.body.user.email}`, { recursive: true }, (err) => {
-            fs.createWriteStream(`client/public${fileUrl}`).write(new Buffer.from(req.body.buffer));
+        const fileUrl = `/files/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
+        // fs.mkdir(`${__dirname}../files/${req.body.user.email}`, { recursive: true }, (err) => {
+        //     fs.createWriteStream(`__dirname + fileUrl`).write();
+        // });
+        console.log(typeof req.body.buffer)
+        const params = {
+            Body: new TextDecoder("utf-8").decode(new Uint8Array(req.body.buffer)),
+            Bucket: "voicetracker",
+            Key: "test.mp3",
+        };
+
+        s3.putObject(params, (err, data) => {
+            if (err) console.log(err, err.stack);
+            else console.log(data);
         });
 
         const newCharacter = {

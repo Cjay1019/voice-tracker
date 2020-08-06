@@ -12,7 +12,7 @@ function CharacterForm({ formOpen, setFormOpen }) {
     const [user] = useContext(UserContext);
     const [characterInfo, setCharacterInfo] = useState({ name: "", description: "" });
     const [isRecording, setRecording] = useState(false);
-    const [audio, setAudio] = useState({ blobUrl: "", buffer: null });
+    const [audio, setAudio] = useState({ blobUrl: "", blob: null });
     const [isBlocked, setBlocked] = useState(false);
 
     useEffect(() => {
@@ -37,6 +37,7 @@ function CharacterForm({ formOpen, setFormOpen }) {
             //     lastModified: Date.now()
             // });
             setAudio({ blobUrl: URL.createObjectURL(blob), buffer });
+            console.log(typeof buffer)
             setRecording(false);
         }).catch(e => console.error(e))
     };
