@@ -24,9 +24,11 @@ function Toolbar({ character, getCharacters }) {
     const [open, setOpen] = useState(false);
 
     const deleteCharacter = () => {
-        axios.post("/api/deleteCharacter", { _id: character._id }).then(res => console.log);
-        setOpen(false);
-        getCharacters();
+        axios.post("/api/deleteCharacter", { character }).then(res => {
+            console.log(res);
+            setOpen(false);
+            getCharacters();
+        });
     };
 
     return (

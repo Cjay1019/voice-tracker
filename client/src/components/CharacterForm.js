@@ -18,7 +18,7 @@ const useStyles = makeStyles({
 
 const Mp3Recorder = new MicRecorder({ bitRate: 320 });
 
-function CharacterForm({ formOpen, setFormOpen }) {
+function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
     const classes = useStyles();
     const [user] = useContext(UserContext);
     const [characterInfo, setCharacterInfo] = useState({ name: "", description: "" });
@@ -54,9 +54,11 @@ function CharacterForm({ formOpen, setFormOpen }) {
     const handleCreate = () => {
         const data = { buffer: audio.buffer, character: characterInfo, user };
         axios.post("/api/createCharacter", data).then(res => {
+            // TODO: Spinner
             console.log(res.data)
+            handleClose();
+            getCharacters();
         });
-        handleClose();
     };
 
 

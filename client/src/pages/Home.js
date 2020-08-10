@@ -33,7 +33,6 @@ function Home() {
     const [formOpen, setFormOpen] = useState(false);
     const [user] = useContext(UserContext);
 
-    const history = useHistory();
     const classes = useStyles();
 
     const getCharacters = () => {
@@ -62,7 +61,7 @@ function Home() {
                     <Tooltip TransitionComponent={Zoom} title="Add character" placement="left">
                         <Fab color="primary" aria-label="add" className={classes.fab} onClick={handleFormOpen}><AddIcon /></Fab>
                     </Tooltip>
-                    <CharacterForm formOpen={formOpen} setFormOpen={setFormOpen} />
+                    <CharacterForm formOpen={formOpen} setFormOpen={setFormOpen} getCharacters={getCharacters} />
                 </>
                 :
                 <CircularProgress className={classes.spinner} />}

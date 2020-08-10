@@ -22,11 +22,6 @@ module.exports = function (app, s3) {
             Key: `${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`,
         };
 
-        s3.putObject(params, (err, data) => {
-            if (err) console.log(err, err.stack);
-            else console.log(data);
-        });
-
         const newCharacter = {
             name: req.body.character.name,
             description: req.body.character.description,
@@ -34,9 +29,14 @@ module.exports = function (app, s3) {
             fileUrl
         };
 
-        Character.create(newCharacter, (err, character) => {
-            if (err) res.json(err);
-            res.json({ success: true, character });
+        s3.putObject(params, (err, data) => {
+            if (err) console.log(err, err.stack);
+            else console.log(data);
+
+            Character.create(newCharacter, (error, character) => {
+                if (error) res.json(error);
+                res.json({ success: true, character });
+            });
         });
     });
 
@@ -48,9 +48,20 @@ module.exports = function (app, s3) {
     });
 
     app.post("/api/deleteCharacter", (req, res) => {
-        Character.deleteOne(req.body, (err, user) => {
-            if (err) res.json(err);
-            res.json(user);
+        const params = {
+            Bucket: process.env.AWS_BUCKET,
+            Key: req.body.character.fileUrl.split(`https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/`)[1],
+        };
+
+        s3.deleteObject(params, (err, data) => {
+            console.log(req.body.character._id)
+            if (err) console.log(err, err.stack);
+            else console.log(data);
+            // TODO: Spinner
+            Character.deleteOne({ _id: req.body.character._id }, (err, user) => {
+                if (err) res.json(err);
+                res.json(user);
+            });
         });
     });
 
