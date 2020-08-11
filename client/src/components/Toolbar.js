@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconButton, Tooltip, Zoom, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
+import { CircularProgress, IconButton, Tooltip, Zoom, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import axios from "axios";
@@ -16,17 +16,25 @@ const useStyles = makeStyles(theme => ({
     },
     cancelButton: {
         color: theme.palette.primary.main
+    },
+    spinner: {
+        width: "36px !important",
+        height: "36px !important",
+        marginRight: "16px !important",
+        marginLeft: "24px !important"
     }
 }));
 
 function Toolbar({ character, getCharacters }) {
     const classes = useStyles();
-    const [open, setOpen] = useState(false);
+    const [isOpen, setOpen] = useState(false);
+    const [isDeleting, setDeleting] = useState(false);
 
     const deleteCharacter = () => {
+        setDeleting(true);
         axios.post("/api/deleteCharacter", { character }).then(res => {
-            console.log(res);
             setOpen(false);
+            setTimeout(() => setDeleting(false), 250);
             getCharacters();
         });
     };
@@ -46,7 +54,7 @@ function Toolbar({ character, getCharacters }) {
             </Tooltip>
 
             <Dialog
-                open={open}
+                open={isOpen}
                 onClose={() => setOpen(false)}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
@@ -54,7 +62,7 @@ function Toolbar({ character, getCharacters }) {
                 <DialogTitle id="alert-dialog-title">{`Delete ${character.name}?`}</DialogTitle>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} className={classes.cancelButton}>Cancel</Button>
-                    <Button onClick={deleteCharacter} autoFocus className={classes.deleteButton}>Delete</Button>
+                    {isDeleting ? <CircularProgress className={classes.spinner} /> : <Button onClick={deleteCharacter} autoFocus className={classes.deleteButton}>Delete</Button>}
                 </DialogActions>
             </Dialog>
         </>

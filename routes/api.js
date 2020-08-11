@@ -54,12 +54,11 @@ module.exports = function (app, s3) {
         };
 
         s3.deleteObject(params, (err, data) => {
-            console.log(req.body.character._id)
             if (err) console.log(err, err.stack);
-            else console.log(data);
-            // TODO: Spinner
+            else console.log(`Deleted file ${req.body.character.fileUrl}`);
             Character.deleteOne({ _id: req.body.character._id }, (err, user) => {
                 if (err) res.json(err);
+                console.log(`Deleted character ${req.body.character.name}`)
                 res.json(user);
             });
         });

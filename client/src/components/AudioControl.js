@@ -26,7 +26,7 @@ function AudioControl({ fileUrl }) {
 
     return (
         <>
-            <ReactAudioPlayer src={fileUrl} ref={rap} />
+            <ReactAudioPlayer src={fileUrl} ref={rap} onEnded={playPause} />
             <Button onClick={event => playPause(event)}>
                 {isPlaying ?
                     <PauseCircleFilledIcon className={classes.audioButton} />

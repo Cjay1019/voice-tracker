@@ -48,6 +48,7 @@ function Signin({ setSignin }) {
         if (user.darkModeOn !== null) update = { ...update, darkModeOn: user.darkModeOn };
         axios.post("/api/updateUser", { filter, update }).catch(err => console.error(err));
 
+        // TODO: handle name here, don't need spread
         setUser({
             ...user,
             name: userData.name,

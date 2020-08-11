@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import AudioControl from "./AudioControl";
 import { UserContext } from "../contexts/UserContext";
+import { CharacterContext } from "../contexts/CharacterContext";
 import MicRecorder from "mic-recorder-to-mp3";
 import axios from "axios";
 import RecordPulse from "./RecordPulse";
-import { TextField, Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles } from '@material-ui/core';
+import { TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles({
     audioContainer: {
@@ -13,18 +14,24 @@ const useStyles = makeStyles({
     },
     recordButton: {
         width: "64px"
+    },
+    spinner: {
+        width: "36px !important",
+        height: "36px !important",
+        marginRight: "16px !important",
+        marginLeft: "24px !important"
     }
 });
 
 const Mp3Recorder = new MicRecorder({ bitRate: 320 });
 
-function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
+function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     const classes = useStyles();
     const [user] = useContext(UserContext);
-    const [characterInfo, setCharacterInfo] = useState({ name: "", description: "" });
+    const [character, setCharacter] = useContext(CharacterContext);
     const [isRecording, setRecording] = useState(false);
-    const [audio, setAudio] = useState({ blobUrl: "", buffer: null });
     const [isBlocked, setBlocked] = useState(false);
+    const [isCreating, setCreating] = useState(false);
 
     useEffect(() => {
         navigator.getUserMedia({ audio: true }, () => setBlocked(false), () => setBlocked(true));
@@ -32,9 +39,13 @@ function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
 
     const handleClose = () => setFormOpen(false);
 
-    const handleChange = e => setCharacterInfo({ ...characterInfo, [e.target.name]: e.target.value });
+    const handleChange = e => setCharacter({ ...character, [e.target.name]: e.target.value });
 
-    const readyToCreate = () => !isRecording && audio.buffer;
+    const audioRecorded = () => !isRecording && character.buffer;
+
+    const readyToCreate = () => audioRecorded() && character.name;
+
+    const resetForm = () => setCharacter({ name: "", description: "", blobUrl: "", buffer: null });
 
     const startRecording = () => {
         if (!isBlocked) {
@@ -42,35 +53,40 @@ function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
         };
     };
 
+
     const stopRecording = () => {
         Mp3Recorder.stop().getMp3().then(([buffer, blob]) => {
             blob.arrayBuffer().then(arrayBuffer => {
-                setAudio({ blobUrl: URL.createObjectURL(blob), buffer: Buffer.from(arrayBuffer) });
+                setCharacter({ ...character, blobUrl: URL.createObjectURL(blob), buffer: Buffer.from(arrayBuffer) });
                 setRecording(false);
             });
         }).catch(e => console.error(e))
     };
 
     const handleCreate = () => {
-        const data = { buffer: audio.buffer, character: characterInfo, user };
+        const data = { buffer: character.buffer, character: character, user };
+        setCreating(true);
         axios.post("/api/createCharacter", data).then(res => {
-            // TODO: Spinner
-            console.log(res.data)
             handleClose();
+            setTimeout(() => setCreating(false), 250);
+            resetForm();
             getCharacters();
+        }).catch(err => {
+            setCreating(false);
+            console.error(err)
         });
     };
 
 
     return (
-        <Dialog open={formOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <Dialog open={formIsOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Create new character</DialogTitle>
             <DialogContent>
                 <TextField
                     autoComplete="off"
                     autoFocus
                     name="name"
-                    value={characterInfo.name}
+                    value={character.name}
                     margin="dense"
                     variant="outlined"
                     id="name"
@@ -82,7 +98,7 @@ function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
                 <TextField
                     autoComplete="off"
                     name="description"
-                    value={characterInfo.description}
+                    value={character.description}
                     multiline
                     rows={4}
                     rowsMax={8}
@@ -98,17 +114,19 @@ function CharacterForm({ formOpen, setFormOpen, getCharacters }) {
                     {isRecording ? "Stop" : "Record"}
                 </Button>
                 <div className={classes.audioContainer}>
-                    {readyToCreate() && <AudioControl fileUrl={audio.blobUrl} />}
+                    {audioRecorded() && <AudioControl fileUrl={character.blobUrl} />}
                 </div>
                 {/* <RecordPulse /> */}
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="primary">
                     Cancel
-          </Button>
-                <Button onClick={handleCreate} color="primary" disabled={!readyToCreate()}>
-                    Create
-          </Button>
+                </Button>
+                {isCreating
+                    ? <CircularProgress className={classes.spinner} />
+                    : <Button onClick={handleCreate} color="primary" disabled={!readyToCreate()}>
+                        Create
+                     </Button>}
             </DialogActions>
         </Dialog>
     )
