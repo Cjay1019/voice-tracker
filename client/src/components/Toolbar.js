@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { CharacterContext } from "../contexts/CharacterContext";
 import { CircularProgress, IconButton, Tooltip, Zoom, makeStyles, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
@@ -25,24 +26,39 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-function Toolbar({ character, getCharacters }) {
+function Toolbar({ characterItem, getCharacters, setFormOpen }) {
     const classes = useStyles();
+    const [character, setCharacter] = useContext(CharacterContext);
     const [isOpen, setOpen] = useState(false);
     const [isDeleting, setDeleting] = useState(false);
 
+    const editCharacter = () => {
+        setFormOpen(true);
+        setCharacter({
+            name: characterItem.name,
+            description: characterItem.description,
+            blobUrl: characterItem.fileUrl,
+            buffer: null,
+            _id: characterItem._id
+        });
+    };
+
     const deleteCharacter = () => {
         setDeleting(true);
-        axios.post("/api/deleteCharacter", { character }).then(res => {
+        axios.post("/api/deleteCharacter", { character: characterItem }).then(res => {
             setOpen(false);
             setTimeout(() => setDeleting(false), 250);
             getCharacters();
-        });
+        }).catch(err => {
+            setDeleting(false);
+            console.error(err)
+        });;
     };
 
     return (
         <>
             <Tooltip TransitionComponent={Zoom} title="Edit character" placement="top" enterDelay={500}>
-                <IconButton aria-label="edit" className={classes.editIcon}>
+                <IconButton aria-label="edit" className={classes.editIcon} onClick={editCharacter}>
                     <EditIcon />
                 </IconButton>
             </Tooltip>
@@ -59,7 +75,7 @@ function Toolbar({ character, getCharacters }) {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{`Delete ${character.name}?`}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">{`Delete ${characterItem.name}?`}</DialogTitle>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)} className={classes.cancelButton}>Cancel</Button>
                     {isDeleting ? <CircularProgress className={classes.spinner} /> : <Button onClick={deleteCharacter} autoFocus className={classes.deleteButton}>Delete</Button>}

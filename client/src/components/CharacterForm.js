@@ -37,7 +37,10 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
         navigator.getUserMedia({ audio: true }, () => setBlocked(false), () => setBlocked(true));
     }, []);
 
-    const handleClose = () => setFormOpen(false);
+    const handleClose = () => {
+        setFormOpen(false);
+        if (isUpdating()) setTimeout(() => resetForm(), 250);
+    };
 
     const handleChange = e => setCharacter({ ...character, [e.target.name]: e.target.value });
 
@@ -45,7 +48,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
 
     const readyToCreate = () => audioRecorded() && character.name;
 
-    const resetForm = () => setCharacter({ name: "", description: "", blobUrl: "", buffer: null });
+    const resetForm = () => setCharacter({ name: "", description: "", blobUrl: "", buffer: null, _id: "" });
 
     const startRecording = () => {
         if (!isBlocked) {
@@ -53,6 +56,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
         };
     };
 
+    const isUpdating = () => character._id ? true : false;
 
     const stopRecording = () => {
         Mp3Recorder.stop().getMp3().then(([buffer, blob]) => {
@@ -64,7 +68,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     };
 
     const handleCreate = () => {
-        const data = { buffer: character.buffer, character: character, user };
+        const data = { buffer: character.buffer, character, user };
         setCreating(true);
         axios.post("/api/createCharacter", data).then(res => {
             handleClose();
@@ -77,10 +81,23 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
         });
     };
 
+    const handleUpdate = () => {
+        const data = { filter: { _id: character._id }, buffer: character.buffer, character, user };
+        setCreating(true);
+        axios.post("/api/updateCharacter", data).then(res => {
+            handleClose();
+            setTimeout(() => setCreating(false), 250);
+            resetForm();
+            getCharacters();
+        }).catch(err => {
+            setCreating(false);
+            console.error(err)
+        });
+    };
 
     return (
         <Dialog open={formIsOpen} onClose={handleClose} aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Create new character</DialogTitle>
+            <DialogTitle id="form-dialog-title">{isUpdating() ? `Update ${character.name}` : "Create new character"}</DialogTitle>
             <DialogContent>
                 <TextField
                     autoComplete="off"
@@ -124,9 +141,9 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
                 </Button>
                 {isCreating
                     ? <CircularProgress className={classes.spinner} />
-                    : <Button onClick={handleCreate} color="primary" disabled={!readyToCreate()}>
-                        Create
-                     </Button>}
+                    : <Button onClick={() => isUpdating() ? handleUpdate() : handleCreate()} color="primary" disabled={!readyToCreate()}>
+                        {isUpdating() ? "Update" : "Create"}
+                    </Button>}
             </DialogActions>
         </Dialog>
     )

@@ -40,6 +40,34 @@ module.exports = function (app, s3) {
         });
     });
 
+    app.post("/api/updateCharacter", (req, res) => {
+        const fileUrl = `https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`
+
+        const params = {
+            ACL: "public-read",
+            Body: Buffer.from(Uint8Array.from(req.body.buffer.data)),
+            Bucket: process.env.AWS_BUCKET,
+            Key: `${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`,
+        };
+
+        const newCharacter = {
+            name: req.body.character.name,
+            description: req.body.character.description,
+            userId: req.body.user.userId,
+            fileUrl
+        };
+
+        s3.putObject(params, (err, data) => {
+            if (err) console.log(err, err.stack);
+            else console.log(data);
+
+            Character.findOneAndUpdate(req.body.filter, newCharacter, (error, character) => {
+                if (error) res.json(error);
+                res.json({ success: true, character });
+            });
+        });
+    });
+
     app.post("/api/updateUser", (req, res) => {
         User.findOneAndUpdate(req.body.filter, req.body.update, (err, user) => {
             if (err) res.json(err);

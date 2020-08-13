@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         left: "50%"
     },
     fab: {
-        position: 'absolute',
+        position: "fixed",
         bottom: theme.spacing(2),
         right: theme.spacing(2),
     }
@@ -56,7 +56,7 @@ function Home() {
             {characters ?
                 <>
                     <TextField onChange={handleChange} value={searchTerm} className={classes.searchBar} id="outlined-search" label="Search by name" variant="outlined" />
-                    <List characters={searchTerm ? filteredCharacters : characters} getCharacters={getCharacters} />
+                    <List characters={searchTerm ? filteredCharacters : characters} getCharacters={getCharacters} formIsOpen={formIsOpen} setFormOpen={setFormOpen} />
                     <Tooltip TransitionComponent={Zoom} title="Add character" placement="left">
                         <Fab color="primary" aria-label="add" className={classes.fab} onClick={openForm}><AddIcon /></Fab>
                     </Tooltip>

@@ -8,18 +8,19 @@ import Toolbar from "./Toolbar";
 const useStyles = makeStyles({
     root: {
         width: "100%",
+        marginBottom: "86px"
     },
     accordianDetails: {
         paddingRight: "0"
     }
 });
 
-function List({ characters, getCharacters }) {
+function List({ characters, getCharacters, formIsOpen, setFormOpen }) {
     const classes = useStyles();
     return (
         <div className={classes.root}>
-            {characters.map(character => (
-                <Accordion key={character.name}>
+            {characters.map(characterItem => (
+                <Accordion key={characterItem.name}>
                     <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-label="Expand"
@@ -30,13 +31,13 @@ function List({ characters, getCharacters }) {
                             aria-label="Acknowledge"
                             onClick={event => event.stopPropagation()}
                             onFocus={event => event.stopPropagation()}
-                            control={<AudioControl fileUrl={character.fileUrl} />}
-                            label={character.name}
+                            control={<AudioControl fileUrl={characterItem.fileUrl} />}
+                            label={characterItem.name}
                         />
                     </AccordionSummary>
                     <AccordionDetails className={classes.accordianDetails}>
-                        <Typography color="textSecondary">{character.description}</Typography>
-                        <Toolbar character={character} getCharacters={getCharacters} />
+                        <Typography color="textSecondary">{characterItem.description}</Typography>
+                        <Toolbar characterItem={characterItem} getCharacters={getCharacters} setFormOpen={setFormOpen} />
                     </AccordionDetails>
                 </Accordion>
             ))}

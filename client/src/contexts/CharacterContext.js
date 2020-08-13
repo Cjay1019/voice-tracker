@@ -7,7 +7,8 @@ export const CharacterProvider = props => {
         name: "",
         description: "",
         blobUrl: "",
-        buffer: null
+        buffer: null,
+        _id: ""
     });
     return (
         <CharacterContext.Provider value={[character, setCharacter]}>
