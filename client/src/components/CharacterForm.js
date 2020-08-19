@@ -44,7 +44,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
 
     const handleChange = e => setCharacter({ ...character, [e.target.name]: e.target.value });
 
-    const audioRecorded = () => !isRecording && character.buffer;
+    const audioRecorded = () => character.fileUrl || (!isRecording && character.buffer);
 
     const readyToCreate = () => audioRecorded() && character.name;
 
@@ -61,14 +61,14 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     const stopRecording = () => {
         Mp3Recorder.stop().getMp3().then(([buffer, blob]) => {
             blob.arrayBuffer().then(arrayBuffer => {
-                setCharacter({ ...character, blobUrl: URL.createObjectURL(blob), buffer: Buffer.from(arrayBuffer) });
+                setCharacter({ ...character, blobUrl: URL.createObjectURL(blob), buffer: Buffer.from(arrayBuffer), fileUrl: "" });
                 setRecording(false);
             });
         }).catch(e => console.error(e))
     };
 
     const handleCreate = () => {
-        const data = { buffer: character.buffer, character, user };
+        const data = { character, user };
         setCreating(true);
         axios.post("/api/createCharacter", data).then(res => {
             handleClose();
@@ -82,7 +82,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     };
 
     const handleUpdate = () => {
-        const data = { filter: { _id: character._id }, buffer: character.buffer, character, user };
+        const data = { filter: { _id: character._id }, character, user };
         setCreating(true);
         axios.post("/api/updateCharacter", data).then(res => {
             handleClose();
@@ -131,7 +131,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
                     {isRecording ? "Stop" : "Record"}
                 </Button>
                 <div className={classes.audioContainer}>
-                    {audioRecorded() && <AudioControl fileUrl={character.blobUrl} />}
+                    {audioRecorded() && <AudioControl fileUrl={character.blobUrl || character.fileUrl} />}
                 </div>
                 {/* <RecordPulse /> */}
             </DialogContent>

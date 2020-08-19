@@ -37,7 +37,8 @@ function Toolbar({ characterItem, getCharacters, setFormOpen }) {
         setCharacter({
             name: characterItem.name,
             description: characterItem.description,
-            blobUrl: characterItem.fileUrl,
+            blobUrl: "",
+            fileUrl: characterItem.fileUrl,
             buffer: null,
             _id: characterItem._id
         });

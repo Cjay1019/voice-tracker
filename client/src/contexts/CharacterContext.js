@@ -7,6 +7,7 @@ export const CharacterProvider = props => {
         name: "",
         description: "",
         blobUrl: "",
+        fileUrl: "",
         buffer: null,
         _id: ""
     });
