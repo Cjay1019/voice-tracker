@@ -30,12 +30,7 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     const [user] = useContext(UserContext);
     const [character, setCharacter] = useContext(CharacterContext);
     const [isRecording, setRecording] = useState(false);
-    const [isBlocked, setBlocked] = useState(false);
     const [isCreating, setCreating] = useState(false);
-
-    useEffect(() => {
-        navigator.getUserMedia({ audio: true }, () => setBlocked(false), () => setBlocked(true));
-    }, []);
 
     const handleClose = () => {
         setFormOpen(false);
@@ -51,9 +46,9 @@ function CharacterForm({ formIsOpen, setFormOpen, getCharacters }) {
     const resetForm = () => setCharacter({ name: "", description: "", blobUrl: "", buffer: null, _id: "" });
 
     const startRecording = () => {
-        if (!isBlocked) {
+        navigator.mediaDevices.getUserMedia({audio:true}).then((stream) => {
             Mp3Recorder.start().then(() => setRecording(true)).catch(e => console.error(e));
-        };
+        }).catch((err) => console.error(err));
     };
 
     const isUpdating = () => character._id ? true : false;
