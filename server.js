@@ -15,7 +15,6 @@ app.use(cookieParser());
 // Serve up static assets
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/client/build")));
-    app.use(express.static(path.join(__dirname, "/files")));
     require('dotenv').config();
     console.log("env success");
 };
