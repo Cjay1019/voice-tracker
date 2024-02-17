@@ -1,11 +1,12 @@
 const express = require("express");
 const path = require("path");
-const PORT = process.env.PORT || 3001;
+const dotenv = require("dotenv");
+dotenv.config();
 const app = express();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const AWS = require("aws-sdk");
-
+const PORT = process.env.PORT || 3001;
 
 // Define middleware here
 app.use(express.json({ limit: "50mb" }));
@@ -30,7 +31,7 @@ const s3 = new AWS.S3({
 require("./utils/passport");
 require("./routes/api.js")(app, s3);
 require("./routes/secure-routes.js")(app);
-app.get("*", (req, res) => res.sendFile(path.join(__dirname, "/client/build/index.html")));
+app.get("*", (req, res) => res.sendFile("/index.html"));
 
 
 
