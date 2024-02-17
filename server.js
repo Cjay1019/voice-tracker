@@ -5,7 +5,7 @@ dotenv.config();
 const app = express();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
-const AWS = require("aws-sdk");
+const AWS = require("@aws-sdk/client-s3");
 const PORT = process.env.PORT || 3001;
 
 // Define middleware here
@@ -21,9 +21,8 @@ if (process.env.NODE_ENV === "production") {
 };
 
 // Configure client for use with Spaces
-const spacesEndpoint = new AWS.Endpoint("nyc3.digitaloceanspaces.com");
 const s3 = new AWS.S3({
-    endpoint: spacesEndpoint,
+    endpoint: "https://s3.us-east-2.amazonaws.com",
     accessKeyId: process.env.AWS_KEY,
     secretAccessKey: process.env.AWS_SECRET
 });
