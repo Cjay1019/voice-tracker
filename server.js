@@ -20,9 +20,8 @@ if (process.env.NODE_ENV === "production") {
 };
 
 // Configure client for use with s3
-AWS.config.update({ region: "us-east-2" });
-
 const s3 = new AWS.S3({
+    region: "us-east-2",
     endpoint: "https://s3.us-east-2.amazonaws.com",
     accessKeyId: process.env.AWS_KEY,
     secretAccessKey: process.env.AWS_SECRET
