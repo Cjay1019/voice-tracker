@@ -24,11 +24,11 @@ passport.use("login", new localStrategy({
 }, async (email, password, done) => {
 
     User.findOne({ "email": email }, (err, user) => {
-        if (err) return done(error);
+        if (err) return done(err);
         if (!user) return done(null, false, { success: false, message: "User not found", error: 1000 });
         else {
             user.isValidPassword(password, (err, match) => {
-                if (err) return done(error);
+                if (err) return done(err);
                 if (!match) return done(null, false, { success: false, message: "Incorrect Password", error: 1001 });
                 else return done(null, user, { success: true, message: "Logged in Successfully" });
             })
