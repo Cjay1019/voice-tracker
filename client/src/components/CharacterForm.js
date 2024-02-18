@@ -4,6 +4,7 @@ import { UserContext } from "../contexts/UserContext";
 import { CharacterContext } from "../contexts/CharacterContext";
 import MicRecorder from "mic-recorder-to-mp3";
 import axios from "axios";
+import { Buffer } from "buffer";
 import RecordPulse from "./RecordPulse";
 import { TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Button, makeStyles } from '@material-ui/core';
 
