@@ -13,7 +13,7 @@ module.exports = function (app, s3) {
     });
 
     app.post("/api/createCharacter", (req, res) => {
-        const fileUrl = `https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
+        const fileUrl = `https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
 
         const params = {
             ACL: "public-read",
@@ -42,14 +42,14 @@ module.exports = function (app, s3) {
     });
 
     app.post("/api/updateCharacter", (req, res) => {
-        const fileUrl = `https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
+        const fileUrl = `https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
         if (req.body.character.fileUrl) {
             console.log(process.env.AWS_BUCKET)
             const copyParams = {
                 Bucket: process.env.AWS_BUCKET,
-                CopySource: req.body.character.fileUrl.split(`https://nyc3.digitaloceanspaces.com/`)[1],
+                CopySource: req.body.character.fileUrl.split(`https://s3.us-east-2.amazonaws.com/`)[1],
                 ACL: "public-read",
-                Key: fileUrl.split(`https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/`)[1]
+                Key: fileUrl.split(`https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/`)[1]
             };
 
             s3.copyObject(copyParams, (err, data) => {
@@ -58,7 +58,7 @@ module.exports = function (app, s3) {
 
                 const deleteParams = {
                     Bucket: process.env.AWS_BUCKET,
-                    Key: req.body.character.fileUrl.split(`https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/`)[1],
+                    Key: req.body.character.fileUrl.split(`https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/`)[1],
                 };
 
                 s3.deleteObject(deleteParams, (err, data) => {
@@ -82,14 +82,14 @@ module.exports = function (app, s3) {
             Character.findOne(req.body.filter, (error, character) => {
                 const deleteParams = {
                     Bucket: process.env.AWS_BUCKET,
-                    Key: character.fileUrl.split(`https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/`)[1],
+                    Key: character.fileUrl.split(`https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/`)[1],
                 };
     
                 s3.deleteObject(deleteParams, (err, data) => {
                     if (err) console.log(err, err.stack);
                     else console.log(`Deleted file ${deleteParams.KEY}`);
     
-                    const fileUrl = `https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
+                    const fileUrl = `https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/${req.body.user.email}/${req.body.character.name.replace(/ /g, "_")}.mp3`;
                     const putParams = {
                         ACL: "public-read",
                         Body: Buffer.from(Uint8Array.from(req.body.character.buffer.data)),
@@ -129,7 +129,7 @@ module.exports = function (app, s3) {
     app.post("/api/deleteCharacter", (req, res) => {
         const params = {
             Bucket: process.env.AWS_BUCKET,
-            Key: req.body.character.fileUrl.split(`https://nyc3.digitaloceanspaces.com/${process.env.AWS_BUCKET}/`)[1],
+            Key: req.body.character.fileUrl.split(`https://s3.us-east-2.amazonaws.com/${process.env.AWS_BUCKET}/`)[1],
         };
 
         s3.deleteObject(params, (err, data) => {
